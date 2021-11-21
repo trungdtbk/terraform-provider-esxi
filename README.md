@@ -1,7 +1,11 @@
 Fork Notes
 ==========
-My fork supports both single --network and/or multiple --net for network_interfaces creation with ova/ovf sources.
-Please see original issue: https://github.com/josenk/terraform-provider-esxi/issues/103
+Created from my actual use-cases involved multiple ovf network interfaces already defined in a signed ova file (by other).
+
+Feature:
+- My fork supports both single --network and/or multiple --net for network_interfaces creation with ova/ovf sources.  So multiple network interfaces already defined in ova/ovf source file will not raise error anymore.
+- Before the changes, you have to extract ovf file from ova source and manually change to only single network interface and then re-package that ova file - which will not work if you have to deal with signed ova file.
+- Please see original issue: https://github.com/josenk/terraform-provider-esxi/issues/103
 
 The changes should work with any variations or orders of the following declaration:
 ```conf
@@ -30,8 +34,9 @@ Support 'net_param' style:
 - default style: --network='VM Network'
 - mixed: --network='VyOS VLAN 20' --net:'WAN=VM Network' --net:'LAN=VyOS VLAN 10'
 
-Test case #1:
+Test case 1:
 - Create with the above example
+- Run terraform apply
 - Add/update
 ``` conf
   network_interfaces {
@@ -46,23 +51,28 @@ Test case #1:
 ```
 - Run terraform apply
 
-Test case #2:
+Test case 2:
 - Create with 1 single network
-- Update with 2,3 more network interfces 
+- Update with 2,3 more network interfaces
 - Run terraform apply
 
-Test case #3:
-- Create with 4 mixed network interfces
+Test case 3:
+- Create with 4 mixed network interfaces
 - Delete 2 network interfaces
 - Run terraform apply
 
-Test case #4:
+Test case 4:
 - Create with default (old) style single network
 - Run terraform apply
 
-Test case #5:
+Test case 5:
 - Define multiple 'esxi_guest' with ovf_network and without ovf_network
 - Run terraform apply
+
+Test case 6:
+- Run terraform destroy and repeat Test Case 1
+- Once successful verify that the value ovf_network has been populated into terraform.tfstate
+- Double-check by running terraform plan, this time it should advise that no changes are needed
 
 Terraform Provider
 ==================
