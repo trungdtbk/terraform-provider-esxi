@@ -1,3 +1,69 @@
+Fork Notes
+==========
+My fork supports both single --network and/or multiple --net for network_interfaces creation with ova/ovf sources.
+Please see original issue: https://github.com/josenk/terraform-provider-esxi/issues/103
+
+The changes should work with any variations or orders of the following declaration:
+```conf
+  network_interfaces {
+    virtual_network = "VM Network"
+    nic_type        = "vmxnet3"
+    ovf_network     = "WAN"
+  }
+
+  network_interfaces {
+    virtual_network = "VyOS VLAN 10"
+    nic_type        = "vmxnet3"
+    ovf_network     = "LAN"
+  }
+
+  network_interfaces {
+    virtual_network = "VyOS VLAN 20"
+    nic_type        = "vmxnet3"
+  }
+```
+
+In the above example, the ova source file defined 2 default ovf network interfaces (WAN and LAN), therefore ```--net:'WAN=VM Network' --net:'LAN=VM Network'``` will be generated as new 'net_param'.  Without these changes, you will see the error message "OVFtool error: No network mapping specified".
+
+Support 'net_param' style:
+- ovf network mapping: --net:'WAN=VM Network' --net:'LAN=VM Network'
+- default style: --network='VM Network'
+- mixed: --network='VyOS VLAN 20' --net:'WAN=VM Network' --net:'LAN=VyOS VLAN 10'
+
+Test case #1:
+- Create with the above example
+- Add/update
+``` conf
+  network_interfaces {
+    virtual_network = "VyOS VLAN 30"
+    nic_type        = "vmxnet3"
+  }
+
+  network_interfaces {
+    virtual_network = "VyOS VLAN 40"
+    nic_type        = "vmxnet3"
+  }
+```
+- Run terraform apply
+
+Test case #2:
+- Create with 1 single network
+- Update with 2,3 more network interfces 
+- Run terraform apply
+
+Test case #3:
+- Create with 4 mixed network interfces
+- Delete 2 network interfaces
+- Run terraform apply
+
+Test case #4:
+- Create with default (old) style single network
+- Run terraform apply
+
+Test case #5:
+- Define multiple 'esxi_guest' with ovf_network and without ovf_network
+- Run terraform apply
+
 Terraform Provider
 ==================
 
