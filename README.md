@@ -34,46 +34,6 @@ Support 'net_param' style:
 - default style: --network='VM Network'
 - mixed: --network='VyOS VLAN 20' --net:'WAN=VM Network' --net:'LAN=VyOS VLAN 10'
 
-Test case 1:
-- Create with the above example
-- Run terraform apply
-- Add/update
-``` conf
-  network_interfaces {
-    virtual_network = "VyOS VLAN 30"
-    nic_type        = "vmxnet3"
-  }
-
-  network_interfaces {
-    virtual_network = "VyOS VLAN 40"
-    nic_type        = "vmxnet3"
-  }
-```
-- Run terraform apply
-
-Test case 2:
-- Create with 1 single network
-- Update with 2,3 more network interfaces
-- Run terraform apply
-
-Test case 3:
-- Create with 4 mixed network interfaces
-- Delete 2 network interfaces
-- Run terraform apply
-
-Test case 4:
-- Create with default (old) style single network
-- Run terraform apply
-
-Test case 5:
-- Define multiple 'esxi_guest' with ovf_network and without ovf_network
-- Run terraform apply
-
-Test case 6:
-- Run terraform destroy and repeat Test Case 1
-- Once successful verify that the value ovf_network has been populated into terraform.tfstate
-- Double-check by running terraform plan, this time it should advise that no changes are needed
-
 Terraform Provider
 ==================
 
